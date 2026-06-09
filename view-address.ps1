@@ -4,6 +4,7 @@ $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Port = if ($env:LAN_SHARE_PORT) { [int]$env:LAN_SHARE_PORT } else { 8000 }
 $AddressFile = Join-Path $Root "lan-share-url.txt"
 $ViewFile = Join-Path $Root "address-view.html"
+$CurrentViewFile = Join-Path $Root "address-current.html"
 
 function Get-LanIp {
     $virtualPattern = "VMware|VirtualBox|Hyper-V|WSL|Docker|TAP|Loopback|Npcap|Bluetooth|vEthernet|Virtual"
@@ -100,9 +101,15 @@ If the page cannot be opened, allow port $Port in Windows Firewall.
 
 $updated = (Get-Item $AddressFile).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
 
-$viewUri = (New-Object System.Uri($ViewFile)).AbsoluteUri
-$query = "?local=" + [uri]::EscapeDataString($localUrl) +
-    "&lan=" + [uri]::EscapeDataString($lanUrl) +
-    "&updated=" + [uri]::EscapeDataString($updated)
+function ConvertTo-HtmlAttribute($Value) {
+    return [System.Net.WebUtility]::HtmlEncode([string]$Value)
+}
 
-Start-Process ($viewUri + $query)
+$html = Get-Content -Path $ViewFile -Raw -Encoding UTF8
+$html = $html.Replace("__LOCAL_URL__", (ConvertTo-HtmlAttribute $localUrl))
+$html = $html.Replace("__LAN_URL__", (ConvertTo-HtmlAttribute $lanUrl))
+$html = $html.Replace("__UPDATED__", (ConvertTo-HtmlAttribute $updated))
+Set-Content -Path $CurrentViewFile -Value $html -Encoding UTF8
+
+$viewUri = (New-Object System.Uri($CurrentViewFile)).AbsoluteUri
+Start-Process $viewUri
