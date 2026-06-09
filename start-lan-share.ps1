@@ -41,24 +41,47 @@ function Test-ServerReady {
 }
 
 function Get-LanIp {
-    $ip = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+    $virtualPattern = "VMware|VirtualBox|Hyper-V|WSL|Docker|TAP|Loopback|Npcap|Bluetooth|vEthernet|Virtual"
+
+    $primary = Get-NetIPConfiguration -ErrorAction SilentlyContinue |
         Where-Object {
-            $_.IPAddress -and
-            $_.IPAddress -notlike "127.*" -and
-            $_.IPAddress -notlike "169.254.*" -and
-            $_.IPAddress -notlike "172.16.*" -and
-            $_.IPAddress -notlike "172.17.*" -and
-            $_.IPAddress -notlike "172.18.*" -and
-            $_.IPAddress -notlike "172.19.*"
+            $_.IPv4Address -and
+            $_.IPv4DefaultGateway -and
+            $_.NetAdapter.Status -eq "Up" -and
+            $_.InterfaceAlias -notmatch $virtualPattern -and
+            $_.InterfaceDescription -notmatch $virtualPattern
         } |
-        Select-Object -First 1 -ExpandProperty IPAddress
+        Select-Object -First 1
+
+    if ($primary) {
+        return $primary.IPv4Address.IPAddress
+    }
+
+    $ip = Get-NetIPConfiguration -ErrorAction SilentlyContinue |
+        Where-Object {
+            $_.IPv4Address -and
+            $_.NetAdapter.Status -eq "Up" -and
+            $_.InterfaceAlias -notmatch $virtualPattern -and
+            $_.InterfaceDescription -notmatch $virtualPattern
+        } |
+        ForEach-Object { $_.IPv4Address.IPAddress } |
+        Where-Object {
+            $_ -and
+            $_ -notlike "127.*" -and
+            $_ -notlike "169.254.*"
+        } |
+        Select-Object -First 1
 
     if ($ip) { return $ip }
 
     return (ipconfig | Select-String -Pattern "IPv4" | ForEach-Object {
         ($_ -split ":\s*", 2)[1].Trim()
     } | Where-Object {
-        $_ -and $_ -notlike "127.*" -and $_ -notlike "169.254.*"
+        $_ -and
+        $_ -notlike "127.*" -and
+        $_ -notlike "169.254.*" -and
+        $_ -notlike "192.168.216.*" -and
+        $_ -notlike "192.168.238.*"
     } | Select-Object -First 1)
 }
 
