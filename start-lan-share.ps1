@@ -8,6 +8,11 @@ $UrlFile = Join-Path $Root "lan-share-url.txt"
 
 Set-Location $Root
 
+function Show-Message($Text) {
+    Add-Type -AssemblyName PresentationFramework
+    [System.Windows.MessageBox]::Show($Text, "LAN Share") | Out-Null
+}
+
 function Find-Python {
     $commands = @(
         @{ File = "py"; Args = "-3" },
@@ -22,14 +27,13 @@ function Find-Python {
         }
     }
 
-    Add-Type -AssemblyName PresentationFramework
-    [System.Windows.MessageBox]::Show("未找到 Python。请先安装 Python 3，或把 python.exe 加入 PATH。", "LAN Share") | Out-Null
+    Show-Message "Python 3 was not found. Please install Python 3 or add python.exe to PATH."
     exit 1
 }
 
 function Test-ServerReady {
     try {
-        $response = Invoke-WebRequest -UseBasicParsing -Uri "$LocalUrlapi/files" -TimeoutSec 1
+        $response = Invoke-WebRequest -UseBasicParsing -Uri "${LocalUrl}api/files" -TimeoutSec 1
         return $response.StatusCode -eq 200
     } catch {
         return $false
@@ -78,8 +82,7 @@ for ($i = 0; $i -lt 30; $i++) {
 }
 
 if (-not $ready) {
-    Add-Type -AssemblyName PresentationFramework
-    [System.Windows.MessageBox]::Show("服务启动失败。请检查端口 $Port 是否被占用，或查看 logs/server.log。", "LAN Share") | Out-Null
+    Show-Message "The web service failed to start. Please check whether port $Port is already in use, then open logs/server.log."
     exit 1
 }
 
@@ -87,13 +90,18 @@ $lanIp = Get-LanIp
 $lanUrl = if ($lanIp) { "http://$lanIp`:$Port/" } else { $LocalUrl }
 
 @"
-本机访问地址：$LocalUrl
-局域网访问地址：$lanUrl
+LAN Share address file
 
-请让手机或其他电脑连接同一个 Wi-Fi/局域网后打开局域网访问地址。
+Local URL:
+$LocalUrl
+
+LAN URL:
+$lanUrl
+
+Open the LAN URL on your phone or another computer connected to the same Wi-Fi/LAN.
+If the page cannot be opened, allow port $Port in Windows Firewall.
 "@ | Set-Content -Path $UrlFile -Encoding UTF8
 
 Start-Process $lanUrl
 
-Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("局域网共享中心已启动。`n`n本机：$LocalUrl`n局域网：$lanUrl`n`n地址已写入 lan-share-url.txt。", "LAN Share") | Out-Null
+Show-Message "LAN Share is running.`n`nLocal URL: $LocalUrl`nLAN URL: $lanUrl`n`nThe address file has been written to lan-share-url.txt."
