@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>局域网共享访问地址</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #edf2f4;
+        --ink: #172026;
+        --muted: #60707c;
+        --line: #d9e3e8;
+        --surface: #ffffff;
+        --soft: #f5f8fa;
+        --accent: #0f766e;
+        --accent-strong: #0a5e58;
+        --warn: #b45309;
+        --shadow: 0 22px 60px rgba(23, 32, 38, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        align-items: center;
+        background:
+          linear-gradient(135deg, rgba(15, 118, 110, 0.13), transparent 34%),
+          linear-gradient(315deg, rgba(180, 83, 9, 0.12), transparent 30%),
+          var(--bg);
+        color: var(--ink);
+        display: flex;
+        font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+        justify-content: center;
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px;
+      }
+
+      main {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(217, 227, 232, 0.9);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        max-width: 860px;
+        overflow: hidden;
+        width: min(100%, 860px);
+      }
+
+      header {
+        background: #172026;
+        color: #ffffff;
+        display: flex;
+        gap: 18px;
+        justify-content: space-between;
+        padding: 28px;
+      }
+
+      .eyebrow {
+        color: #8ddbd3;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        margin: 0 0 8px;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        font-size: clamp(26px, 5vw, 42px);
+        line-height: 1.1;
+        margin: 0;
+      }
+
+      .badge {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.11);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        color: #ffffff;
+        font-weight: 800;
+        padding: 10px 14px;
+        white-space: nowrap;
+      }
+
+      .content {
+        display: grid;
+        gap: 16px;
+        padding: 24px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      .label-row {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .url {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: var(--ink);
+        font-family: Consolas, "Courier New", monospace;
+        font-size: clamp(17px, 3vw, 24px);
+        font-weight: 800;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+        padding: 16px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      button,
+      a.button {
+        align-items: center;
+        background: var(--accent);
+        border: 0;
+        border-radius: 9px;
+        color: #ffffff;
+        cursor: pointer;
+        display: inline-flex;
+        font: inherit;
+        font-weight: 850;
+        min-height: 42px;
+        padding: 0 16px;
+        text-decoration: none;
+      }
+
+      button.secondary,
+      a.button.secondary {
+        background: #eaf0f3;
+        color: var(--ink);
+      }
+
+      button:hover,
+      a.button:hover {
+        filter: brightness(0.96);
+      }
+
+      .hint {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 12px;
+        color: var(--warn);
+        line-height: 1.7;
+        margin: 0;
+        padding: 14px 16px;
+      }
+
+      footer {
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 24px 24px;
+      }
+
+      @media (max-width: 680px) {
+        header,
+        footer {
+          flex-direction: column;
+        }
+
+        .badge {
+          align-self: stretch;
+          text-align: center;
+        }
+
+        .actions {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
+        button,
+        a.button {
+          justify-content: center;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">LAN Share</p>
+          <h1>访问地址面板</h1>
+        </div>
+        <div class="badge">同一局域网可访问</div>
+      </header>
+
+      <section class="content">
+        <article class="card">
+          <div class="label-row">
+            <span class="label">本机访问地址</span>
+            <span class="label">Local URL</span>
+          </div>
+          <div class="url" id="localUrl"></div>
+          <div class="actions">
+            <button type="button" data-copy="localUrl">复制本机地址</button>
+            <a class="button secondary" id="openLocal" target="_blank" rel="noreferrer">打开本机地址</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="label-row">
+            <span class="label">手机/其他电脑访问地址</span>
+            <span class="label">LAN URL</span>
+          </div>
+          <div class="url" id="lanUrl"></div>
+          <div class="actions">
+            <button type="button" data-copy="lanUrl">复制局域网地址</button>
+            <a class="button secondary" id="openLan" target="_blank" rel="noreferrer">打开局域网地址</a>
+          </div>
+        </article>
+
+        <p class="hint">
+          手机需要连接到同一个 Wi-Fi 或局域网。如果打不开，请检查防火墙是否允许 8000 端口访问，并确认 LAN URL 不是 VMware、Docker、WSL 等虚拟网卡地址。
+        </p>
+      </section>
+
+      <footer>
+        <span id="updated"></span>
+        <span id="toast">准备就绪</span>
+      </footer>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const local = params.get("local") || "http://127.0.0.1:8000/";
+      const lan = params.get("lan") || "请先运行一键启动脚本";
+      const updated = params.get("updated") || "";
+
+      const localEl = document.querySelector("#localUrl");
+      const lanEl = document.querySelector("#lanUrl");
+      const toast = document.querySelector("#toast");
+      const openLocal = document.querySelector("#openLocal");
+      const openLan = document.querySelector("#openLan");
+
+      localEl.textContent = local;
+      lanEl.textContent = lan;
+      openLocal.href = local;
+      openLan.href = /^https?:\/\//.test(lan) ? lan : "#";
+      document.querySelector("#updated").textContent = updated ? `更新时间：${updated}` : "";
+
+      async function copyText(value) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+          return;
+        }
+
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+
+      document.querySelectorAll("[data-copy]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const target = document.querySelector(`#${button.dataset.copy}`);
+          await copyText(target.textContent.trim());
+          toast.textContent = "已复制到剪贴板";
+          window.setTimeout(() => {
+            toast.textContent = "准备就绪";
+          }, 1800);
+        });
+      });
+    </script>
+  </body>
+</html>
