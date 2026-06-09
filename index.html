@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>局域网共享中心</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">LAN Share</p>
+        <h1>局域网共享中心</h1>
+      </div>
+      <div class="status">
+        <span class="status-dot"></span>
+        <span>内网可访问</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="section-label">当前入口</p>
+          <h2 id="shareTitle">团队资料分享入口</h2>
+          <p>
+            在一台电脑上启动共享服务后，同一 Wi-Fi 或有线局域网内的手机、平板和电脑都可以通过浏览器访问、上传和下载文件。
+          </p>
+        </div>
+        <div class="access-panel">
+          <label for="shareUrl">访问地址</label>
+          <div class="copy-row">
+            <input id="shareUrl" readonly value="http://127.0.0.1:8000/" />
+            <button id="copyUrl" type="button">复制</button>
+          </div>
+          <p id="copyHint" class="hint">启动服务后，其他设备可用同一局域网内的访问地址打开。</p>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="panel notice-panel">
+          <div class="panel-heading">
+            <p class="section-label">公告</p>
+            <button id="editNotice" type="button" class="ghost-button">编辑</button>
+          </div>
+          <div id="noticeText" class="notice-text">
+            今日共享目录已更新，可以在“共享文件记录”中查找最新文件。
+          </div>
+          <form id="noticeForm" class="notice-form" hidden>
+            <textarea id="noticeInput" rows="5"></textarea>
+            <div class="form-actions">
+              <button type="button" id="cancelNotice" class="ghost-button">取消</button>
+              <button type="submit">保存</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <p class="section-label">常用链接</p>
+            <span class="count" id="linkCount">0</span>
+          </div>
+          <ul id="linkList" class="link-list"></ul>
+        </article>
+
+        <article class="panel wide">
+          <div class="panel-heading">
+            <p class="section-label">共享文件记录</p>
+            <div class="file-tools">
+              <div class="filter">
+                <label for="fileSearch">搜索</label>
+                <input id="fileSearch" type="search" placeholder="输入名称或类型" />
+              </div>
+              <button id="refreshButton" type="button" class="ghost-button">刷新</button>
+              <button id="uploadButton" type="button">上传共享文件</button>
+              <input id="fileUpload" type="file" multiple hidden />
+            </div>
+          </div>
+          <p id="uploadStatus" class="upload-status">正在读取共享文件...</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>类型</th>
+                  <th>大小</th>
+                  <th>更新时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="fileTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <p class="section-label">使用提示</p>
+          <ol class="steps">
+            <li>在共享电脑上双击启动脚本。</li>
+            <li>确认 Windows 防火墙允许 8000 端口访问。</li>
+            <li>其他设备打开启动脚本提示的局域网访问地址。</li>
+          </ol>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <span>适用于办公室、实验室、教室和家庭内网。</span>
+      <span id="clock"></span>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
