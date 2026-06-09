@@ -83,8 +83,6 @@ function renderFiles(keyword = "") {
           <td>${escapeHtml(file.size)}</td>
           <td>${escapeHtml(file.updated)}</td>
           <td class="record-actions">
-            <a class="table-link" href="${file.url}" target="_blank" rel="noreferrer">打开</a>
-            <a class="table-link" href="${file.url}" download>下载</a>
             <button class="table-delete" type="button" data-path="${escapeHtml(file.path)}">删除</button>
           </td>
         </tr>
