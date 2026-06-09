@@ -3,8 +3,8 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Port = if ($env:LAN_SHARE_PORT) { [int]$env:LAN_SHARE_PORT } else { 8000 }
 $AddressFile = Join-Path $Root "lan-share-url.txt"
+$TemplateFile = Join-Path $Root "address-template.html"
 $ViewFile = Join-Path $Root "address-view.html"
-$CurrentViewFile = Join-Path $Root "address-current.html"
 
 function Get-LanIp {
     $virtualPattern = "VMware|VirtualBox|Hyper-V|WSL|Docker|TAP|Loopback|Npcap|Bluetooth|vEthernet|Virtual"
@@ -55,9 +55,9 @@ if (-not (Test-Path $AddressFile)) {
     New-Item -ItemType File -Path $AddressFile -Force | Out-Null
 }
 
-if (-not (Test-Path $ViewFile)) {
+if (-not (Test-Path $TemplateFile)) {
     Add-Type -AssemblyName PresentationFramework
-    [System.Windows.MessageBox]::Show("address-view.html was not found. Please put it in the same folder as this launcher.", "LAN Share") | Out-Null
+    [System.Windows.MessageBox]::Show("address-template.html was not found. Please put it in the same folder as this launcher.", "LAN Share") | Out-Null
     exit 1
 }
 
@@ -105,11 +105,11 @@ function ConvertTo-HtmlAttribute($Value) {
     return [System.Net.WebUtility]::HtmlEncode([string]$Value)
 }
 
-$html = Get-Content -Path $ViewFile -Raw -Encoding UTF8
+$html = Get-Content -Path $TemplateFile -Raw -Encoding UTF8
 $html = $html.Replace("__LOCAL_URL__", (ConvertTo-HtmlAttribute $localUrl))
 $html = $html.Replace("__LAN_URL__", (ConvertTo-HtmlAttribute $lanUrl))
 $html = $html.Replace("__UPDATED__", (ConvertTo-HtmlAttribute $updated))
-Set-Content -Path $CurrentViewFile -Value $html -Encoding UTF8
+Set-Content -Path $ViewFile -Value $html -Encoding UTF8
 
-$viewUri = (New-Object System.Uri($CurrentViewFile)).AbsoluteUri
+$viewUri = (New-Object System.Uri($ViewFile)).AbsoluteUri
 Start-Process $viewUri

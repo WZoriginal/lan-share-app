@@ -4,6 +4,7 @@ files/*
 logs/
 server.log
 lan-share-url.txt
+address-view.html
 address-current.html
 .lan-share.pid
 __pycache__/
